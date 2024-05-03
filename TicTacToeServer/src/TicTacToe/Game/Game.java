@@ -88,7 +88,7 @@ public class Game implements Serializable {
         return currentPlayer;
     }
 
-    public void resetboard()
+    public void resetboard(boolean switchSides)
     {
         for (int i = 0; i < buttons.length; i++)
         {
@@ -98,16 +98,19 @@ public class Game implements Serializable {
         {
             winner[i] = 0;
         }
-        swapFirstMoveMaker();
-        if (xGoesTo == 1)
+        if (switchSides)
         {
-            xGoesTo = 2;
+            swapFirstMoveMaker();
+            if (xGoesTo == 1)
+            {
+                xGoesTo = 2;
+            }
+            else
+            {
+                xGoesTo = 1;
+            }
+            winTurnErrorHandled = false;
         }
-        else
-        {
-            xGoesTo = 1;
-        }
-        winTurnErrorHandled = false;
     }
 
     boolean buttonPressed (int button, int player)

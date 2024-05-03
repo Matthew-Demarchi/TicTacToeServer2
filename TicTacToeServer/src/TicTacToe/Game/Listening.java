@@ -35,28 +35,35 @@ public class Listening implements Runnable {
             message = in.readLine();
             System.out.println("read in data for Player " + player);
 
-            if (message == null)
-            {
+            if (message == null) {
 //                System.out.println("no message");
-                if (socket.isClosed())
-                {
+                if (socket.isClosed()) {
                     shutdown();
                 }
                 continue;
-            }
-            else if (message.contains("/move"))
-            {
-                turn(String.valueOf(message.charAt(message.length()-1)));
-            } else if (message.contains("/quit"))
-            {
-                if (!gameData.isShutdown())
-                {
+            } else if (message.contains("/move")) {
+                turn(String.valueOf(message.charAt(message.length() - 1)));
+            } else if (message.contains("/quit")) {
+                if (!gameData.isShutdown()) {
                     gameData.alert("/quit" + player);
                 }
                 shutdown = true;
+            } else if (message.contains("/difficulty")) {
+                gameData.alert(message);
             }
-            else if (message.contains("/difficulty"))
+            else if (message.contains("/clearBoard"))
             {
+                System.out.println("clear board message received");
+                gameData.alert(message);
+            }
+            else if (message.contains("/switchSides"))
+            {
+                System.out.println("switch sides message received");
+                gameData.alert(message);
+            }
+            else if (message.contains("/message"))
+            {
+                System.out.println("chat message received");
                 gameData.alert(message);
             }
             else
@@ -84,7 +91,7 @@ public class Listening implements Runnable {
             System.out.println(valid);
             if (!valid)
             {
-                new Thread(new Notify(socket, new Message("invalid"), gameData.game, gameData.objectOutputStream)).start(); // FIX THIS---------------------------------------------------------------
+                new Thread(new Notify(socket, new Message("/invalid"), gameData.game, gameData.objectOutputStream)).start(); // FIX THIS---------------------------------------------------------------
             }
             else
             {

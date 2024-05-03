@@ -14,6 +14,11 @@ public class Message implements Serializable
     {
         this.message = message;
     }
+    public Message (String message, String chatMessage)
+    {
+        this.message = message;
+        this.chatMessage = chatMessage;
+    }
     public Message(String message, Game game)
     {
         this.message = message;

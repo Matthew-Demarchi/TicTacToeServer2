@@ -11,6 +11,7 @@ public class NotifyAI implements Runnable {
     ObjectOutputStream objectOutputStream;
 
 
+
     NotifyAI(Socket socket, Message message, Game game, ObjectOutputStream objectOutputStream)
     {
         this.socket = socket;
@@ -24,7 +25,7 @@ public class NotifyAI implements Runnable {
         {
             try {
 
-                if (message.message.equals("invalid"))
+                if (message.message.equals("/invalid"))
                 {
 //                System.out.println("Invalid Message");
 //                out = new PrintWriter(socket.getOutputStream(), true);
@@ -45,7 +46,7 @@ public class NotifyAI implements Runnable {
 //                out.println("yourTurn");
                     // THIS FUNCTION IS NOT SPECIFIC TO AI SO IT IS DONE IN THE STANDARD NOTIFIER
                 }
-                else if (message.message.equals("valid"))
+                else if (message.message.equals("/valid"))
                 {
                     System.out.println("Valid Message1");
                     boolean gameOver = game.isGameOver();
@@ -60,7 +61,7 @@ public class NotifyAI implements Runnable {
                         if (gameOver)
                         {
                             System.out.println("game over Message1");
-                            objectOutputStream.writeObject(new Message("gameOver"));
+                            objectOutputStream.writeObject(new Message("/gameOver"));
 
                         }
                     }
@@ -70,7 +71,7 @@ public class NotifyAI implements Runnable {
                 {
                     System.out.println("New TicTacToe.Game Started");
                     {
-                        objectOutputStream.writeObject(new Message("1"));
+                        objectOutputStream.writeObject(new Message("/1"));
 
                         objectOutputStream.writeObject(game);
                         System.out.println("New TicTacToe.Game Started1");
@@ -83,6 +84,11 @@ public class NotifyAI implements Runnable {
                     System.out.println("shutdown");
                     objectOutputStream.writeObject(message);
                     System.out.println("shutdown signal sent");
+                }
+                else if (message.message.contains("/message"))
+                {
+                    objectOutputStream.writeObject(message);
+                    System.out.println("message sent in notify.AI PROBLEM THIS SHOULD NEVER ACTUALLY BE ABLE TO HAPPEN");
                 }
                 else
                 {}
@@ -108,7 +114,7 @@ public class NotifyAI implements Runnable {
         {
             System.out.println("swapTurns1");
 
-            objectOutputStream.writeObject(new Message("yourTurn"));
+            objectOutputStream.writeObject(new Message("/yourTurn"));
 
 
         }
@@ -116,7 +122,7 @@ public class NotifyAI implements Runnable {
         {
             System.out.println("swapTurns2");
 
-            objectOutputStream.writeObject(new Message("notYourTurn"));
+            objectOutputStream.writeObject(new Message("/notYourTurn"));
 
 
 

@@ -22,6 +22,7 @@ public class GameData implements Runnable { // rename to gameManager
     int turn = 1;
     int mode = 0;
     boolean easy = false; // for AI
+    boolean switchSides = true; // for AI
     ObjectOutputStream objectOutputStream;
     ObjectOutputStream objectOutputStream2;
 
@@ -82,7 +83,7 @@ public class GameData implements Runnable { // rename to gameManager
                 System.out.println("not waiting for sockets...");
                 if (message.contains("/move")) {
                     System.out.println("calling Notify for valid move");
-                        new Thread(new Notify(new Message("valid"), this)).start();
+                        new Thread(new Notify(new Message("/valid"), this)).start();
 
                     try {
                         gameOver();
@@ -94,6 +95,15 @@ public class GameData implements Runnable { // rename to gameManager
                 {
                     System.out.println("quit");
                     playerShutdown(String.valueOf(message.charAt(message.length()-1)));
+                }
+                else if (message.contains("/message"))
+                {
+                    System.out.println("sending message to notify");
+                    new Thread(new Notify(new Message("/message", message.substring(8)), this)).start();
+                }
+                else
+                {
+                    System.out.println("error, non valid message received -- " + message);
                 }
             }
         }
@@ -118,7 +128,7 @@ public class GameData implements Runnable { // rename to gameManager
                 if (message.contains("/move")) {
                     System.out.println("calling Notify for valid moveAI");
 
-                    new Thread(new NotifyAI(socket1, new Message("valid"), game, objectOutputStream)).start();
+                    new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
 //                    if (objectOutputStream != null)
 //                    {
 //                        try {
@@ -144,6 +154,18 @@ public class GameData implements Runnable { // rename to gameManager
                 } else if (message.contains("/difficulty")) {
                     setEasy(String.valueOf(message.charAt(message.length() - 1)));
                 }
+                else if (message.contains("/clearBoard"))
+                {
+                    clearBoard();
+                }
+                else if (message.contains("/switchSides"))
+                {
+                    setSwapTurns(String.valueOf(message.charAt(message.length() - 1)));
+                }
+                else
+                {
+                    System.out.println("error, non valid message received -- " + message);
+                }
             }
         }
         else {
@@ -151,21 +173,45 @@ public class GameData implements Runnable { // rename to gameManager
             shutdown();
         }
     }
+    private void clearBoard() {
+        game.resetboard(false);
+
+        swapTurn();
+
+        game.currentPlayer = game.getxGoesTo();
+        System.out.println("turn is equal to " + turn);
+
+        if (game.getxGoesTo() == 2)
+        {
+            aiMakeMove();
+        }
+        else
+        {
+            new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
+        }
+
+    }
     public void gameOver() throws InterruptedException {
         if (game.isGameOver())
         {
             System.out.println("resetting board");
             swapTurn();
             Thread.sleep(3000);
-            game.resetboard();
             if (mode == 2)
             {
-                new Thread(new Notify(new Message("valid"), this)).start();
+                game.resetboard(true);
+                new Thread(new Notify(new Message("/valid"), this)).start();
             }
             else
             {
-                new Thread(new NotifyAI(socket1,  new Message("valid"), game, objectOutputStream)).start();
-                if (turn == 2)
+                game.resetboard(switchSides);
+                if (!switchSides)
+                {
+                    game.currentPlayer = game.getxGoesTo();
+                    System.out.println("turn is equal to " + turn);
+                }
+                new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
+                if (game.getxGoesTo() == 2)
                 {
                     aiMakeMove();
                 }
@@ -189,22 +235,38 @@ public class GameData implements Runnable { // rename to gameManager
             easy = false;
         }
     }
+    private void setSwapTurns(String a)
+    {
+        if (a.equalsIgnoreCase("Y"))
+        {
+            switchSides = true;
+        }
+        else
+        {
+            switchSides = false;
+        }
+    }
 
     private void swapTurn()
     {
-        if (game.isGameOver())
+        if (mode == 2 || switchSides)
         {
-            if (turn == 1)
+            if (game.isGameOver())
             {
-                turn = 2;
-                System.out.println("swapped to turn 2");
+                if (turn == 1)
+                {
+                    turn = 2;
+                    System.out.println("swapped to turn 2");
+                }
+                else
+                {
+                    turn = 1;
+                    System.out.println("swapped to turn 1");
+                }
             }
-            else
-            {
-                turn = 1;
-                System.out.println("swapped to turn 1");
-            }
+            System.out.println("swapped to switch turn");
         }
+
     }
     private void playerShutdown(String playerThatQuit)
     {
@@ -249,7 +311,7 @@ public class GameData implements Runnable { // rename to gameManager
             }
             int aiMove = TicTacToeAI.TicTacToeAI(easy, game.buttons, 2, 1);
             boolean valid = game.buttonPressed(aiMove, 2);
-            new Thread(new NotifyAI(socket1, new Message("valid"), game, objectOutputStream)).start();
+            new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
         }
 
     }
