@@ -12,15 +12,24 @@ public class Listening implements Runnable {
     Socket socket = null;
     int player;
     String message;
-    public Listening(GameData gameData)
+//    public Listening(GameData gameData)
+//    {
+//        this.gameData = gameData;
+//    }
+
+public Listening(Socket socket)
     {
-        this.gameData = gameData;
+        this.socket = socket;
     }
 
     public void setSocket(Socket socket, int player) {
         this.socket = socket;
         this.player = player;
         System.out.println("Listening on Player" + player);
+    }
+    public void setGameData(GameData gameData)
+    {
+        this.gameData = gameData;
     }
 
     @Override
@@ -35,39 +44,52 @@ public class Listening implements Runnable {
             message = in.readLine();
             System.out.println("read in data for Player " + player);
 
-            if (message == null) {
+            if (gameData != null)
+            {
+                if (message == null) {
 //                System.out.println("no message");
-                if (socket.isClosed()) {
-                    shutdown();
+                    if (socket.isClosed()) {
+                        shutdown();
+                    }
+                    continue;
+                } else if (message.contains("/move")) {
+                    turn(String.valueOf(message.charAt(message.length() - 1)));
+                } else if (message.contains("/quit")) {
+                    if (!gameData.isShutdown()) {
+                        gameData.alert("/quit" + player);
+                    }
+                    shutdown = true;
+                    Main.removeSocket(socket);
+                } else if (message.contains("/difficulty")) {
+                    gameData.alert(message);
                 }
-                continue;
-            } else if (message.contains("/move")) {
-                turn(String.valueOf(message.charAt(message.length() - 1)));
-            } else if (message.contains("/quit")) {
-                if (!gameData.isShutdown()) {
-                    gameData.alert("/quit" + player);
+                else if (message.contains("/clearBoard"))
+                {
+                    System.out.println("clear board message received");
+                    gameData.alert(message);
                 }
-                shutdown = true;
-            } else if (message.contains("/difficulty")) {
-                gameData.alert(message);
-            }
-            else if (message.contains("/clearBoard"))
-            {
-                System.out.println("clear board message received");
-                gameData.alert(message);
-            }
-            else if (message.contains("/switchSides"))
-            {
-                System.out.println("switch sides message received");
-                gameData.alert(message);
-            }
-            else if (message.contains("/message"))
-            {
-                System.out.println("chat message received");
-                gameData.alert(message);
+                else if (message.contains("/switchSides"))
+                {
+                    System.out.println("switch sides message received");
+                    gameData.alert(message);
+                }
+                else if (message.contains("/message"))
+                {
+                    System.out.println("chat message received");
+                    gameData.alert(message);
+                }
+                else
+                {continue;}
             }
             else
-            {continue;}
+            {
+                if (message.contains("/quit"))
+                {
+                    EstablishGame.removeSocket(socket, this);
+                    Main.removeSocket(socket);
+                    shutdown = true;
+                }
+            }
 
 
         }

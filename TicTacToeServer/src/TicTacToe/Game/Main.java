@@ -15,13 +15,12 @@ public class Main {
         try {
             serverSocket = new ServerSocket(80);
             Socket clientSocket;
-            EstablishGame establishGame = new EstablishGame();
 
             while (!shutdown)
             {
                 sockets.add(serverSocket.accept());
                 System.out.println("accepted");
-                establishGame.addSocket(sockets.get(sockets.size() - 1));
+                EstablishGame.addSocket(sockets.get(sockets.size() - 1));
             }
 
 

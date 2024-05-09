@@ -66,8 +66,8 @@ public class GameData implements Runnable { // rename to gameManager
             System.out.println("mode 2 started");
             listening1.setSocket(socket1, 1);
             listening2.setSocket(socket2, 2);
-            new Thread(this.listening1).start();
-            new Thread(this.listening2).start();
+            listening1.setGameData(this);
+            listening2.setGameData(this);
 
             new Thread(new Notify(new Message("newGame"), this)).start();
 
@@ -110,7 +110,7 @@ public class GameData implements Runnable { // rename to gameManager
         else if (mode == 1) { //////////////////////////////////////////////////////
             System.out.println("mode 1 started");
             listening1.setSocket(socket1, 1);
-            new Thread(this.listening1).start();
+            listening1.setGameData(this);
 
 
             new Thread(new NotifyAI(socket1, new Message("newGame"), game, objectOutputStream)).start();
