@@ -37,20 +37,26 @@ public class EstablishGame
             GameData gameData = new GameData(sockets.get(0), sockets.get(1), 2, gameID++);
             gameData.setListening1(listenings.get(0));
             gameData.setListening2(listenings.get(1));
-            Controller.newGame(gameData);
+            GamesList.newGame(gameData);
             new Thread(gameData).start();
             gameData = null;
-            sockets.clear();
-            listenings.clear();
+            for (int i = 0; i < 2; i++)
+            {
+                sockets.remove(0);
+                listenings.remove(0);
+            }
             System.out.println("SocketSize " + sockets.size());
         }
     }
     static void makeAIGame(Socket socket)
     {
-
+            System.out.println("makeAIGame");
             GameData gameData = new GameData(socket, 1, gameID++);
-            gameData.setListening1(new Listening(socket));
-            Controller.newGame(gameData);
+            Listening temp = new Listening(socket);
+            new Thread(temp).start();
+            gameData.setListening1(temp);
+            temp = null;
+            GamesList.newGame(gameData);
             new Thread(gameData).start();
             gameData = null;
             System.out.println("AI GAME STARTED ");

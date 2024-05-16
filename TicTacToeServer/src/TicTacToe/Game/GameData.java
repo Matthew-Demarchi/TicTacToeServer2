@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import TicTacToe.Game.AI.TicTacToeAI;
 
-//TODO FIX 2 PLAYER AND 1 PLAYER ISSUE WITH MODES
+
 public class GameData implements Runnable { // rename to gameManager
 
     public Game game;
@@ -101,6 +101,10 @@ public class GameData implements Runnable { // rename to gameManager
                     System.out.println("sending message to notify");
                     new Thread(new Notify(new Message("/message", message.substring(8)), this)).start();
                 }
+                else if (message.contains("/serverShutdown"))
+                {
+                    System.out.println("serverShutdown");
+                }
                 else
                 {
                     System.out.println("error, non valid message received -- " + message);
@@ -113,7 +117,8 @@ public class GameData implements Runnable { // rename to gameManager
             listening1.setGameData(this);
 
 
-            new Thread(new NotifyAI(socket1, new Message("newGame"), game, objectOutputStream)).start();
+            new Thread(new Notify(new Message("newGame"), this)).start();
+//            new Thread(new NotifyAI(socket1, new Message("newGame"), game, objectOutputStream)).start();
 
             while (!shutdown) {
                 synchronized (sync) {
@@ -128,15 +133,8 @@ public class GameData implements Runnable { // rename to gameManager
                 if (message.contains("/move")) {
                     System.out.println("calling Notify for valid moveAI");
 
-                    new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
-//                    if (objectOutputStream != null)
-//                    {
-//                        try {
-//                            objectOutputStream.reset();
-//                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
+                    new Thread(new Notify(new Message("/valid"), this)).start();
+//                    new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
 
                     if (!game.isGameOver())
                     {
@@ -162,6 +160,10 @@ public class GameData implements Runnable { // rename to gameManager
                 {
                     setSwapTurns(String.valueOf(message.charAt(message.length() - 1)));
                 }
+                else if (message.contains("/serverShutdown"))
+                {
+                    System.out.println("serverShutdown");
+                }
                 else
                 {
                     System.out.println("error, non valid message received -- " + message);
@@ -172,6 +174,7 @@ public class GameData implements Runnable { // rename to gameManager
             System.out.println("ERROR INVALID MODE");
             shutdown();
         }
+        System.out.println("gamedata stopped");
     }
     private void clearBoard() {
         game.resetboard(false);
@@ -187,7 +190,8 @@ public class GameData implements Runnable { // rename to gameManager
         }
         else
         {
-            new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
+            new Thread(new Notify(new Message("/valid"), this)).start();
+//            new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
         }
 
     }
@@ -210,7 +214,8 @@ public class GameData implements Runnable { // rename to gameManager
                     game.currentPlayer = game.getxGoesTo();
                     System.out.println("turn is equal to " + turn);
                 }
-                new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
+                new Thread(new Notify(new Message("/valid"), this)).start();
+//                new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
                 if (game.getxGoesTo() == 2)
                 {
                     aiMakeMove();
@@ -286,7 +291,14 @@ public class GameData implements Runnable { // rename to gameManager
     private void shutdown()
     {
         shutdown = true;
-        Controller.endGame(game.gameID);
+        GamesList.endGame(game.gameID);
+    }
+    public void serverShutdown()
+    {
+        shutdown = true;
+        GamesList.endGame(game.gameID);
+        new Thread(new Notify(new Message("/serverShutdown"), this)).start();
+        alert ("/serverShutdown");
     }
 
     public void alert(String message)
@@ -311,7 +323,8 @@ public class GameData implements Runnable { // rename to gameManager
             }
             int aiMove = TicTacToeAI.TicTacToeAI(easy, game.buttons, 2, 1);
             boolean valid = game.buttonPressed(aiMove, 2);
-            new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
+            new Thread (new Notify(new Message("/valid"), this)).start();
+//            new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
         }
 
     }

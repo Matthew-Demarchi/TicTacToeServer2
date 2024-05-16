@@ -12,10 +12,6 @@ public class Listening implements Runnable {
     Socket socket = null;
     int player;
     String message;
-//    public Listening(GameData gameData)
-//    {
-//        this.gameData = gameData;
-//    }
 
 public Listening(Socket socket)
     {
@@ -36,6 +32,7 @@ public Listening(Socket socket)
     public void run() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println("Listening on Player" + player);
 
         while (!shutdown) // make sockets trade off by move
         {
@@ -47,20 +44,26 @@ public Listening(Socket socket)
             if (gameData != null)
             {
                 if (message == null) {
-//                System.out.println("no message");
+                System.out.println("no message");
                     if (socket.isClosed()) {
+                        System.out.println("socket is closed");
                         shutdown();
                     }
                     continue;
                 } else if (message.contains("/move")) {
+                    System.out.println("moving " + message);
                     turn(String.valueOf(message.charAt(message.length() - 1)));
                 } else if (message.contains("/quit")) {
                     if (!gameData.isShutdown()) {
                         gameData.alert("/quit" + player);
                     }
                     shutdown = true;
-                    Main.removeSocket(socket);
-                } else if (message.contains("/difficulty")) {
+                } else if (message.contains("/serverShutdown"))
+                {
+                    System.out.println("Server shutting down message recieved");
+                    shutdown = true;
+                }
+                else if (message.contains("/difficulty")) {
                     gameData.alert(message);
                 }
                 else if (message.contains("/clearBoard"))
@@ -79,10 +82,13 @@ public Listening(Socket socket)
                     gameData.alert(message);
                 }
                 else
-                {continue;}
+                {
+                    System.out.println("unknown message received");
+                    continue;}
             }
             else
             {
+                System.out.println("Game data null");
                 if (message.contains("/quit"))
                 {
                     EstablishGame.removeSocket(socket, this);
@@ -90,7 +96,6 @@ public Listening(Socket socket)
                     shutdown = true;
                 }
             }
-
 
         }
 
@@ -101,6 +106,7 @@ public Listening(Socket socket)
         {
             System.out.println("Shutting down listener for player" + player);
         }
+        System.out.println("Shutting down listener for player" + player);
     }
     private void turn(String move) throws IOException
     {

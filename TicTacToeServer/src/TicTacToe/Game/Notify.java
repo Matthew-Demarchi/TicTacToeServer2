@@ -37,17 +37,9 @@ public class Notify implements Runnable {
             {
                 System.out.println("Invalid Message");
                 objectOutputStream.writeObject(message);
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
+
                 objectOutputStream.writeObject(game);
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
+
                 objectOutputStream.writeObject(new Message("/yourTurn"));
 
             }
@@ -59,11 +51,7 @@ public class Notify implements Runnable {
 
                     objectOutputStream.writeObject(message);
 
-//                    try {
-//                        Thread.sleep(500);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
+
                     System.out.println("buttons -- " + gameData.game.buttons());
 
                     System.out.println(gameData.game.toString());
@@ -75,47 +63,33 @@ public class Notify implements Runnable {
                     if (gameOver)
                     {
                         System.out.println("game over Message1");
-//                        try {
-//                            Thread.sleep(500);
-//                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-//                        }
+
                         objectOutputStream.writeObject(new Message("/gameOver"));
                     }
                 }
                 {
-                    System.out.println("Valid Message2");
-
-
-                    objectOutputStream2.writeObject(message);
-
-//                    try {
-//                        Thread.sleep(500);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-                    System.out.println("buttons -- " + gameData.game.buttons());
-                    System.out.println(gameData.game.toString());
-                    objectOutputStream2.writeObject((gameData.game));
-                    System.out.println("Valid Message over2");
-
-
-                    if (gameOver)
+                    if (gameData.mode == 2)
                     {
-                        System.out.println("game over Message2");
-//                        try {
-//                            Thread.sleep(500);
-//                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-//                        }
-                        objectOutputStream2.writeObject(new Message("/gameOver"));
+                        System.out.println("Valid Message2");
+
+
+                        objectOutputStream2.writeObject(message);
+
+                        System.out.println("buttons -- " + gameData.game.buttons());
+                        System.out.println(gameData.game.toString());
+                        objectOutputStream2.writeObject((gameData.game));
+                        System.out.println("Valid Message over2");
+
+
+                        if (gameOver)
+                        {
+                            System.out.println("game over Message2");
+                            objectOutputStream2.writeObject(new Message("/gameOver"));
+                        }
                     }
+
                 }
-//                try {
-//                    Thread.sleep(50);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
+
                 swapTurns(gameOver);
             }
             else if(message.message.equals("newGame"))
@@ -124,23 +98,13 @@ public class Notify implements Runnable {
                 {
                     objectOutputStream.writeObject(new Message("/1"));
 
-//                    try {
-//                        Thread.sleep(500);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
                     objectOutputStream.writeObject(gameData.game);
                     System.out.println("New TicTacToe.Game Started1");
                 }
+                if (gameData.mode == 2)
                 {
 
                     objectOutputStream2.writeObject(new Message("/2"));
-
-//                    try {
-//                        Thread.sleep(500);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
 
                     objectOutputStream2.writeObject(gameData.game);
 
@@ -156,11 +120,23 @@ public class Notify implements Runnable {
                 objectOutputStream.writeObject(message);
                 System.out.println("shutdown signal sent");
             }
+            else if (message.message.equals("/serverShutdown"))
+            {
+                System.out.println("Shutting down server");
+                objectOutputStream.writeObject(message);
+                if (gameData.mode == 2)
+                {
+                    objectOutputStream2.writeObject(message);
+                }
+            }
             else if (message.message.contains("/message"))
             {
-                objectOutputStream.writeObject(message);
-                objectOutputStream2.writeObject(message);
-                System.out.println("message sent");
+                if (gameData.mode == 2)
+                {
+                    objectOutputStream.writeObject(message);
+                    objectOutputStream2.writeObject(message);
+                    System.out.println("message sent");
+                }
             }
             else
             {}
@@ -171,7 +147,7 @@ public class Notify implements Runnable {
                     objectOutputStream.reset();
 
                 }
-                if (objectOutputStream2 != null)
+                if (objectOutputStream2 != null && gameData.mode == 2)
                 {
                     objectOutputStream2.reset();
                 }
@@ -182,15 +158,10 @@ public class Notify implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
     private void swapTurns(boolean gameover) throws IOException {
         System.out.println("swapTurns");
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
         System.out.println(gameData.game.whoGetsNextMove() + " who gets next move");
         if (gameover)
         {}
@@ -201,7 +172,10 @@ public class Notify implements Runnable {
 
             objectOutputStream.writeObject(new Message("/yourTurn"));
 
-            objectOutputStream2.writeObject(new Message("/notYourTurn"));
+            if (gameData.mode == 2)
+            {
+                objectOutputStream2.writeObject(new Message("/notYourTurn"));
+            }
         }
         else
         {
@@ -210,12 +184,10 @@ public class Notify implements Runnable {
 
             objectOutputStream.writeObject(new Message("/notYourTurn"));
 
-
-            objectOutputStream2.writeObject(new Message("/yourTurn"));
-
+            if (gameData.mode == 2) {
+                objectOutputStream2.writeObject(new Message("/yourTurn"));
+            }
         }
         System.out.println("swap turn end");
-
     }
-
 }
