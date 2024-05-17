@@ -60,10 +60,10 @@ public class GameData implements Runnable { // rename to gameManager
     }
     public void run()
     {
-        System.out.println("gamedata started");
+        //System.out.println("gamedata started");
         if (mode == 2)
         {
-            System.out.println("mode 2 started");
+            //System.out.println("mode 2 started");
             listening1.setSocket(socket1, 1);
             listening2.setSocket(socket2, 2);
             listening1.setGameData(this);
@@ -74,15 +74,15 @@ public class GameData implements Runnable { // rename to gameManager
             while (!shutdown) {
                 synchronized (sync) {
                     try {
-                        System.out.println("Waiting for sockets...");
+                        //System.out.println("Waiting for sockets...");
                         sync.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("not waiting for sockets...");
+                //System.out.println("not waiting for sockets...");
                 if (message.contains("/move")) {
-                    System.out.println("calling Notify for valid move");
+                    //System.out.println("calling Notify for valid move");
                         new Thread(new Notify(new Message("/valid"), this)).start();
 
                     try {
@@ -93,12 +93,12 @@ public class GameData implements Runnable { // rename to gameManager
                 }
                 else if (message.contains("/quit"))
                 {
-                    System.out.println("quit");
+                    //System.out.println("quit");
                     playerShutdown(String.valueOf(message.charAt(message.length()-1)));
                 }
                 else if (message.contains("/message"))
                 {
-                    System.out.println("sending message to notify");
+                    //System.out.println("sending message to notify");
                     new Thread(new Notify(new Message("/message", message.substring(8)), this)).start();
                 }
                 else if (message.contains("/serverShutdown"))
@@ -111,30 +111,28 @@ public class GameData implements Runnable { // rename to gameManager
                 }
             }
         }
-        else if (mode == 1) { //////////////////////////////////////////////////////
-            System.out.println("mode 1 started");
+        else if (mode == 1) {
+            //System.out.println("mode 1 started");
             listening1.setSocket(socket1, 1);
             listening1.setGameData(this);
 
 
             new Thread(new Notify(new Message("newGame"), this)).start();
-//            new Thread(new NotifyAI(socket1, new Message("newGame"), game, objectOutputStream)).start();
 
             while (!shutdown) {
                 synchronized (sync) {
                     try {
-                        System.out.println("Waiting for socket... -- AI Game");
+                        //System.out.println("Waiting for socket... -- AI Game");
                         sync.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("not waiting for socket...");
+                //System.out.println("not waiting for socket...");
                 if (message.contains("/move")) {
-                    System.out.println("calling Notify for valid moveAI");
+                    //System.out.println("calling Notify for valid moveAI");
 
                     new Thread(new Notify(new Message("/valid"), this)).start();
-//                    new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
 
                     if (!game.isGameOver())
                     {
@@ -147,7 +145,7 @@ public class GameData implements Runnable { // rename to gameManager
                         throw new RuntimeException(e);
                     }
                 } else if (message.contains("/quit")) {
-                    System.out.println("quit");
+                    //System.out.println("quit");
                     playerShutdown(String.valueOf(message.charAt(message.length() - 1)));
                 } else if (message.contains("/difficulty")) {
                     setEasy(String.valueOf(message.charAt(message.length() - 1)));
@@ -171,10 +169,10 @@ public class GameData implements Runnable { // rename to gameManager
             }
         }
         else {
-            System.out.println("ERROR INVALID MODE");
+            //System.out.println("ERROR INVALID MODE");
             shutdown();
         }
-        System.out.println("gamedata stopped");
+        //System.out.println("gamedata stopped");
     }
     private void clearBoard() {
         game.resetboard(false);
@@ -182,7 +180,7 @@ public class GameData implements Runnable { // rename to gameManager
         swapTurn();
 
         game.currentPlayer = game.getxGoesTo();
-        System.out.println("turn is equal to " + turn);
+        //System.out.println("turn is equal to " + turn);
 
         if (game.getxGoesTo() == 2)
         {
@@ -191,14 +189,13 @@ public class GameData implements Runnable { // rename to gameManager
         else
         {
             new Thread(new Notify(new Message("/valid"), this)).start();
-//            new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
         }
 
     }
     public void gameOver() throws InterruptedException {
         if (game.isGameOver())
         {
-            System.out.println("resetting board");
+            //System.out.println("resetting board");
             swapTurn();
             Thread.sleep(3000);
             if (mode == 2)
@@ -212,10 +209,9 @@ public class GameData implements Runnable { // rename to gameManager
                 if (!switchSides)
                 {
                     game.currentPlayer = game.getxGoesTo();
-                    System.out.println("turn is equal to " + turn);
+                    //System.out.println("turn is equal to " + turn);
                 }
                 new Thread(new Notify(new Message("/valid"), this)).start();
-//                new Thread(new NotifyAI(socket1,  new Message("/valid"), game, objectOutputStream)).start();
                 if (game.getxGoesTo() == 2)
                 {
                     aiMakeMove();
@@ -261,15 +257,15 @@ public class GameData implements Runnable { // rename to gameManager
                 if (turn == 1)
                 {
                     turn = 2;
-                    System.out.println("swapped to turn 2");
+                    //System.out.println("swapped to turn 2");
                 }
                 else
                 {
                     turn = 1;
-                    System.out.println("swapped to turn 1");
+                    //System.out.println("swapped to turn 1");
                 }
             }
-            System.out.println("swapped to switch turn");
+            //System.out.println("swapped to switch turn");
         }
 
     }
@@ -324,7 +320,6 @@ public class GameData implements Runnable { // rename to gameManager
             int aiMove = TicTacToeAI.TicTacToeAI(easy, game.buttons, 2, 1);
             boolean valid = game.buttonPressed(aiMove, 2);
             new Thread (new Notify(new Message("/valid"), this)).start();
-//            new Thread(new NotifyAI(socket1, new Message("/valid"), game, objectOutputStream)).start();
         }
 
     }
