@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Listening implements Runnable {
 
@@ -114,7 +115,14 @@ public Listening(Socket socket)
 
         } //end try block
         catch (Exception e) {
-            throw new RuntimeException(e);
+            if (e instanceof SocketException && e.getMessage().equals("Socket closed") || e.getMessage().equals("Connection reset"))
+            {
+                gameData.alert("/quit" + player);
+            }
+            else
+            {
+                throw new RuntimeException(e);
+            }
         }
         finally
         {

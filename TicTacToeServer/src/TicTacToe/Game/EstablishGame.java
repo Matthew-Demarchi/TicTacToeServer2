@@ -16,17 +16,27 @@ public class EstablishGame
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String i = reader.readLine();
         System.out.println(i + "-- i");
-        if (i.contains("1"))
-        {
-            makeAIGame(socket);
-        }
-        else {
-            sockets.add(socket);
-            listenings.add(new Listening(socket));
-            new Thread(listenings.get(listenings.size()-1)).start();
-            System.out.println("add socket");
+        if (i != null) {
+            if (i.contains("1")) {
+                makeAIGame(socket);
+            } else {
+                sockets.add(socket);
+                listenings.add(new Listening(socket));
+                new Thread(listenings.get(listenings.size() - 1)).start();
+                System.out.println("add socket");
 
-            makeGame();
+                makeGame();
+            }
+        }
+        else
+        {
+            //error has occurred,
+            if (socket.isConnected())
+            {
+                socket.close();
+            }
+            Main.removeSocket(socket);
+
         }
     }
 
