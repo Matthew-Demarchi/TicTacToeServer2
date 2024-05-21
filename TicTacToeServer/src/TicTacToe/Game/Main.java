@@ -20,7 +20,7 @@ public class Main {
             while (!shutdown)
             {
                 sockets.add(serverSocket.accept());
-                System.out.println("accepted");
+//                System.out.println("accepted");
                 EstablishGame.addSocket(sockets.get(sockets.size() - 1));
             }
 

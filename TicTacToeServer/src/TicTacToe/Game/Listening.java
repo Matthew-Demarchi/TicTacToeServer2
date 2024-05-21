@@ -22,7 +22,7 @@ public Listening(Socket socket)
     public void setSocket(Socket socket, int player) {
         this.socket = socket;
         this.player = player;
-        System.out.println("Listening on Player" + player);
+//        System.out.println("Listening on Player" + player);
     }
 
     public void setGameData(GameData gameData)
@@ -36,14 +36,14 @@ public Listening(Socket socket)
         try
         {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            System.out.println("Listening on Player" + player);
+//            System.out.println("Listening on Player" + player);
 
             while (!shutdown) // make sockets trade off by move
             {
-                System.out.println("the socket is closed -- " + socket.isClosed());
-                System.out.println("reading in data for Player " + player);
+//                System.out.println("the socket is closed -- " + socket.isClosed());
+//                System.out.println("reading in data for Player " + player);
                 message = in.readLine();
-                System.out.println("read in data for Player " + player);
+//                System.out.println("read in data for Player " + player);
 
                 if (gameData != null)
                 {
@@ -59,7 +59,7 @@ public Listening(Socket socket)
                     }
                     else if (message.contains("/move"))
                     {
-                        System.out.println("moving " + message);
+//                        System.out.println("moving " + message);
                         turn(String.valueOf(message.charAt(message.length() - 1)));
                     }
                     else if (message.contains("/quit"))
@@ -72,7 +72,7 @@ public Listening(Socket socket)
                     }
                     else if (message.contains("/serverShutdown"))
                     {
-                        System.out.println("Server shutting down message recieved");
+//                        System.out.println("Server shutting down message recieved");
                         shutdown = true;
                     }
                     else if (message.contains("/difficulty")) {
@@ -80,17 +80,17 @@ public Listening(Socket socket)
                     }
                     else if (message.contains("/clearBoard"))
                     {
-                        System.out.println("clear board message received");
+//                        System.out.println("clear board message received");
                         gameData.alert(message);
                     }
                     else if (message.contains("/switchSides"))
                     {
-                        System.out.println("switch sides message received");
+//                        System.out.println("switch sides message received");
                         gameData.alert(message);
                     }
                     else if (message.contains("/message"))
                     {
-                        System.out.println("chat message received");
+//                        System.out.println("chat message received");
                         gameData.alert(message);
                     }
                     else
@@ -128,7 +128,7 @@ public Listening(Socket socket)
         {
             System.out.println("Shutting down listener for player" + player);
         }
-        System.out.println("Shutting down listener for player" + player);
+//        System.out.println("Shutting down listener for player" + player);
     }
 
 
@@ -136,18 +136,18 @@ public Listening(Socket socket)
     {
         boolean valid = true;
 
-            System.out.println("reading in for turn " + player);
+//            System.out.println("reading in for turn " + player);
             int buttonPressed = Integer.parseInt(move);
-            System.out.println(buttonPressed + " -- buttonpressed");
+//            System.out.println(buttonPressed + " -- buttonpressed");
             valid = gameData.game.buttonPressed(buttonPressed, player);
-            System.out.println(valid);
+//            System.out.println(valid);
             if (!valid)
             {
-                new Thread(new Notify(socket, new Message("/invalid"), gameData.game, gameData.objectOutputStream)).start(); // FIX THIS---------------------------------------------------------------
+                new Thread(new Notify(socket, new Message("/invalid"), gameData.game, gameData.objectOutputStream)).start();
             }
             else
             {
-                System.out.println("alert for move");
+//                System.out.println("alert for move");
                 gameData.alert("/move");
             }
     }

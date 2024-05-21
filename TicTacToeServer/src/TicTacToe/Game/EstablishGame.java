@@ -15,7 +15,7 @@ public class EstablishGame
     static void addSocket(Socket socket) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String i = reader.readLine();
-        System.out.println(i + "-- i");
+//        System.out.println(i + "-- i");
         if (i != null) {
             if (i.contains("1")) {
                 makeAIGame(socket);
@@ -23,7 +23,7 @@ public class EstablishGame
                 sockets.add(socket);
                 listenings.add(new Listening(socket));
                 new Thread(listenings.get(listenings.size() - 1)).start();
-                System.out.println("add socket");
+//                System.out.println("add socket");
 
                 makeGame();
             }
@@ -55,12 +55,12 @@ public class EstablishGame
                 sockets.remove(0);
                 listenings.remove(0);
             }
-            System.out.println("SocketSize " + sockets.size());
+//            System.out.println("SocketSize " + sockets.size());
         }
     }
     static void makeAIGame(Socket socket)
     {
-            System.out.println("makeAIGame");
+//            System.out.println("makeAIGame");
             GameData gameData = new GameData(socket, 1, gameID++);
             Listening temp = new Listening(socket);
             new Thread(temp).start();
@@ -69,7 +69,7 @@ public class EstablishGame
             GamesList.newGame(gameData);
             new Thread(gameData).start();
             gameData = null;
-            System.out.println("AI GAME STARTED ");
+//            System.out.println("AI GAME STARTED ");
         }
         static void removeSocket(Socket socket, Listening listening)
         {

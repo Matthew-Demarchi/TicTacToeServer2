@@ -15,11 +15,9 @@ public class GamesList
     static public void newGame(GameData game)
     {
         games.add(game);
-        outputGames();
     }
     static public void endGame(long gameID)
     {
-        outputGames();
         for (int i = 0; i < games.size(); i++)
         {
             if (gameID == games.get(i).game.getGameID())

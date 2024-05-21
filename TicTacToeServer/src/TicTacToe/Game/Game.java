@@ -115,7 +115,7 @@ public class Game implements Serializable {
 
     boolean buttonPressed (int button, int player)
     {
-        System.out.println(button + " pressed " + player);
+//        System.out.println(button + " pressed " + player);
         if (buttons[button] == 0 && player == whoGetsNextMove())
         {
             buttons[button] = player; // buttons -- 0 == empty, 1 == player1, 2 == player2
@@ -172,7 +172,7 @@ public class Game implements Serializable {
     {
         if (winTurnErrorHandled)
         {
-            System.out.println("winTurnErrorHandled already");
+//            System.out.println("winTurnErrorHandled already");
             return;
         }
 
@@ -180,12 +180,12 @@ public class Game implements Serializable {
             if (whoGetsFirstMove == 1)
             {
                 currentPlayer = 2;
-                System.out.println("whoGetsFirstMove handled with 2");
+//                System.out.println("whoGetsFirstMove handled with 2");
             }
             else
             {
                 currentPlayer = 1;
-                System.out.println("whoGetsFirstMove handled with 1");
+//                System.out.println("whoGetsFirstMove handled with 1");
             }
             winTurnErrorHandled = true;
 
